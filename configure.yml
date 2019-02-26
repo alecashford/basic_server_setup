@@ -11,15 +11,16 @@
   - name: Gathering facts
     setup: # aka gather_facts
   tasks:
-  - name: Add 'alec' sudo user
+  - name: Add local current user '{{lookup('env','USER')}}' as sudo user on remote host
     user:
-      name: alec
-      password: password
+      name: "{{lookup('env','USER')}}"
+      password: "$6$MHGI8a4O9gBjmIja$ptiTXls.qDwwOM.FDxh/QFkPyC9d4oF4WMAlXLLPiUtvNG8w9igEbyjN0s1N9/CnMmZTLXiYZRm9vQbNrcNJk/"
+      update_password: "always"
       groups:
         - sudo
       state: present # Tell ansible we want the user to exist.
-  - name: Set SSH key for alec user
+  - name: Set SSH key for the '{{lookup('env','USER')}}' user
     authorized_key:
-      user: alec
+      user: "{{lookup('env','USER')}}"
       state: present
-      key: "{{ lookup('file', '/Users/aashford/.ssh/id_rsa.pub') }}"
+      key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
