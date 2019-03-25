@@ -11,16 +11,53 @@
   - name: Gathering facts
     setup: # aka gather_facts
   tasks:
+  - name: Make sure we have a 'wheel' group
+    group:
+      name: wheel
+      state: present
+  - name: Allow 'wheel' group to have passwordless sudo
+    lineinfile:
+      dest: /etc/sudoers
+      state: present
+      regexp: '^%wheel'
+      line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+      validate: visudo -cf %s
+  # Adds an admin user to mirror that of local user
   - name: Add local current user '{{lookup('env','USER')}}' as sudo user on remote host
     user:
       name: "{{lookup('env','USER')}}"
       password: "$6$MHGI8a4O9gBjmIja$ptiTXls.qDwwOM.FDxh/QFkPyC9d4oF4WMAlXLLPiUtvNG8w9igEbyjN0s1N9/CnMmZTLXiYZRm9vQbNrcNJk/"
       update_password: "always"
+      # Needed for Ubuntu/Debian; otherwise, defaults to /bin/sh due to Ansible's use of useradd (not adduser)
+      shell: /bin/bash
       groups:
-        - sudo
+        - sudo, wheel
       state: present # Tell ansible we want the user to exist.
   - name: Set SSH key for the '{{lookup('env','USER')}}' user
     authorized_key:
       user: "{{lookup('env','USER')}}"
       state: present
       key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+  - name: Add deploy user as sudo user on remote host
+    user:
+      name: "deploy"
+      shell: /bin/bash
+      groups:
+        - sudo, wheel
+      state: present
+  - name: Create deploy users's .ssh directory
+    file:
+      path: /home/deploy/.ssh
+      state: directory
+  - name: Set public SSH key for the deploy user
+    copy:
+      src: "{{playbook_dir}}/id_rsa.pub"
+      dest: "/home/deploy/.ssh/id_rsa.pub"
+      owner: "deploy"
+      mode: "644"
+  - name: Set private SSH key for the deploy user
+    copy:
+      src: "{{playbook_dir}}/id_rsa"
+      dest: "/home/deploy/.ssh/id_rsa"
+      owner: "deploy"
+      mode: "600"
