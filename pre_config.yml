@@ -1,0 +1,8 @@
+---
+  - name: Install python 2 for Ansible
+    raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+    register: output
+    changed_when:
+      - output.stdout != "" and output.stdout != "\r\n"
+  - name: Gathering facts
+    setup: # aka gather_facts

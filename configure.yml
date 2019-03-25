@@ -1,0 +1,19 @@
+---
+- name: Prepare server, create users and access/permissions framework
+  hosts: all
+  gather_facts: False
+  remote_user: root
+
+  pre_tasks:
+    - include: pre_config.yml
+  tasks:
+    - include: users_ssh_keys_permissions.yml
+
+
+- name: Install docker
+  hosts: all
+  become_user: deploy
+  gather_facts: true
+
+  tasks:
+    - include: createuser.yml new_user=username
