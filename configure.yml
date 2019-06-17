@@ -10,10 +10,10 @@
     - include: users_ssh_keys_permissions.yml
 
 
-- name: Install docker
-  hosts: all
-  become_user: deploy
-  gather_facts: true
+# - name: Install docker
+#   hosts: all
+#   become_user: deploy
+#   gather_facts: true
 
-  tasks:
-    - include: createuser.yml new_user=username
+#   tasks:
+#     - include: createuser.yml new_user=username
