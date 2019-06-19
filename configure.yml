@@ -3,17 +3,13 @@
   hosts: all
   gather_facts: False
   remote_user: root
-
-  pre_tasks:
-    - include: pre_config.yml
   tasks:
+    - include: pre_config.yml
+
+- name: Install docker and configure users
+  hosts: all
+  remote_user: root
+  gather_facts: True
+  tasks:
+    - include: install_docker.yml
     - include: users_ssh_keys_permissions.yml
-
-
-# - name: Install docker
-#   hosts: all
-#   become_user: deploy
-#   gather_facts: true
-
-#   tasks:
-#     - include: createuser.yml new_user=username

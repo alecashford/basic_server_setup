@@ -19,7 +19,7 @@
       # Needed for Ubuntu/Debian; otherwise, defaults to /bin/sh due to Ansible's use of useradd (not adduser)
       shell: /bin/bash
       groups:
-        - sudo, wheel
+        - sudo, wheel, docker
       state: present # Tell ansible we want the user to exist.
   - name: Set SSH key for the '{{lookup('env','USER')}}' user
     authorized_key:
@@ -31,7 +31,7 @@
       name: "deploy"
       shell: /bin/bash
       groups:
-        - sudo, wheel
+        - sudo, wheel, docker
       state: present
   - name: Create deploy users's .ssh directory
     file:
